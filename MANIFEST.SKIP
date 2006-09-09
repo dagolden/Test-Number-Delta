@@ -1,0 +1,23 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+.svn/
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^pm_to_blib$
+^blib/
+^MakeMaker-\d
+^Build$
+^_build
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#
+\.swp$
+\.bak$
+
