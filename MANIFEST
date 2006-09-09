@@ -16,6 +16,8 @@ t/06-plan_passthrough.t
 t/07-noplan_passthrough.t
 t/08-param_and_plan_passthrough.t
 t/09-bad_param_plan_order.t
+t/10-specify_negative_epsilon.t
+t/11-specify_negative_relative.t
 t/98-pod.t
 t/99-pod_coverage.t
 Todo
