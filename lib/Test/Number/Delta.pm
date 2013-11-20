@@ -50,7 +50,7 @@ At some point or another, most programmers find they need to compare
 floating-point numbers for equality.  The typical idiom is to test
 if the absolute value of the difference of the numbers is within a desired
 tolerance, usually called epsilon.  This module provides such a function for use
-with L<Test::Harness>.  Usage is similar to other test functions described in
+with L<Test::More>.  Usage is similar to other test functions described in
 L<Test::More>.  Semantically, the C<delta_within> function replaces this kind
 of construct:
 
