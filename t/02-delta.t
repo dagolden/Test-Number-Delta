@@ -1,6 +1,6 @@
 use strict;
 
-use Test::Builder::Tester tests => 25;
+use Test::Builder::Tester 1.02 tests => 25;
 use Test::Number::Delta;
 
 select(STDERR); $|++;

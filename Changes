@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Number::Delta
 
+{{$NEXT}}
+
+
 1.03 Sun Sep  3 03:21:59 EDT 2006
     - fixed logic errors for delta_not_*
     - changed epsilon restriction to just non-zero; negative epsilons are

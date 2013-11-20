@@ -1,9 +1,10 @@
-package Test::Number::Delta;
 use strict;
-#use warnings; bah -- not supported before 5.006
+use warnings;
+package Test::Number::Delta;
+# ABSTRACT: Compare the difference between numbers against a given tolerance
+# VERSION
 
-use vars qw ($VERSION @EXPORT @ISA);
-$VERSION = "1.03";
+use vars qw (@EXPORT @ISA);
 
 # Required modules
 use Carp;
@@ -12,10 +13,6 @@ use Exporter;
 
 @ISA = qw( Exporter );
 @EXPORT = qw( delta_not_ok delta_ok delta_within delta_not_within );
-
-=head1 NAME
-
-Test::Number::Delta - Compare the difference between numbers against a given tolerance
 
 =head1 SYNOPSIS
 
@@ -236,7 +233,7 @@ The sample prints the following:
 
 =cut
 
-sub delta_within($$$;$) {
+sub delta_within($$$;$) { ## no critic
 	my ($p, $q, $epsilon, $name) = @_;
     croak "Value of epsilon to delta_within must be non-zero"
         if $epsilon == 0;
@@ -263,7 +260,7 @@ as C<delta_within>.
 
 =cut
 
-sub delta_ok($$;$) {
+sub delta_ok($$;$) { ## no critic
 	my ($p, $q, $name) = @_;
     {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -291,7 +288,7 @@ the same as C<delta_within>.
 
 =cut
 
-sub delta_not_within($$$;$) {
+sub delta_not_within($$$;$) { ## no critic
 	my ($p, $q, $epsilon, $name) = @_;
     croak "Value of epsilon to delta_not_within must be non-zero"
         if $epsilon == 0;
@@ -314,7 +311,7 @@ the same as C<delta_not_within>.
 
 =cut
 
-sub delta_not_ok($$;$) {
+sub delta_not_ok($$;$) { ## no critic
 	my ($p, $q, $name) = @_;
     {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -326,62 +323,4 @@ sub delta_not_ok($$;$) {
 }
 
 
-1; #this line is important and will help the module return a true value
-__END__
-
-=head1 SEE ALSO
-
-L<Test::More>, L<Test::Harness>, L<Test::Builder>
-
-=head1 BUGS
-
-Please report any bugs or feature using the CPAN Request Tracker.  
-Bugs can be submitted by email to C<bug-Test-Number-Delta@rt.cpan.org> or 
-through the web interface at 
-L<http://rt.cpan.org/Dist/Display.html?Queue=Test-Number-Delta>
-
-When submitting a bug or request, please include a test-file or a patch to an
-existing test-file that illustrates the bug or desired feature.
-
-=head1 AUTHOR
-
-David A Golden (DAGOLDEN)
-
-dagolden@cpan.org
-
-L<http://dagolden.com/>
-
-=head1 COPYRIGHT
-
-Copyright (c) 2005, 2006 by David A. Golden
-
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
-
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
-
-=cut
+1;
