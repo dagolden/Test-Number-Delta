@@ -2,6 +2,9 @@ Revision history for Perl module Test::Number::Delta
 
 {{$NEXT}}
 
+    - Modernized distribution metadata and licensing
+
+    - Distribution now managed with Dist::Zilla
 
 1.03 Sun Sep  3 03:21:59 EDT 2006
     - fixed logic errors for delta_not_*
