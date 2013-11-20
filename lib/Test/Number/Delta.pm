@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+
 package Test::Number::Delta;
 # ABSTRACT: Compare the difference between numbers against a given tolerance
 # VERSION
@@ -11,38 +12,38 @@ use Carp;
 use Test::Builder;
 use Exporter;
 
-@ISA = qw( Exporter );
+@ISA    = qw( Exporter );
 @EXPORT = qw( delta_not_ok delta_ok delta_within delta_not_within );
 
 =head1 SYNOPSIS
 
   # Import test functions
   use Test::Number::Delta;
-  
+
   # Equality test with default tolerance
   delta_ok( 1e-5, 2e-5, 'values within 1e-6');
-  
+
   # Inequality test with default tolerance
   delta_not_ok( 1e-5, 2e-5, 'values not within 1e-6');
-  
+
   # Provide specific tolerance
-  delta_within( 1e-3, 2e-3, 1e-4, 'values within 1e-4');         
+  delta_within( 1e-3, 2e-3, 1e-4, 'values within 1e-4');
   delta_not_within( 1e-3, 2e-3, 1e-4, 'values not within 1e-4');
-  
+
   # Compare arrays or matrices
   @a = ( 3.14, 1.41 );
   @b = ( 3.15, 1.41 );
   delta_ok( \@a, \@b, 'compare @a and @b' );
 
-  # Set a different default tolerance 
+  # Set a different default tolerance
   use Test::Number::Delta within => 1e-5;
   delta_ok( 1.1e-5, 2e-5, 'values within 1e-5'); # ok
-  
+
   # Set a relative tolerance
   use Test::Number::Delta relative => 1e-3;
   delta_ok( 1.01, 1.0099, 'values within 1.01e-3');
- 
-  
+
+
 =head1 DESCRIPTION
 
 At some point or another, most programmers find they need to compare
@@ -66,7 +67,7 @@ C<delta_ok>.  Both functions are exported automatically.
 Because checking floating-point equality is not always reliable, it is not
 possible to check the 'equal to' boundary of 'less than or equal to
 epsilon'.  Therefore, Test::Number::Delta only compares if the absolute value
-of the difference is B<less than> epsilon (for equality tests) or 
+of the difference is B<less than> epsilon (for equality tests) or
 B<greater than> epsilon (for inequality tests).
 
 =head1 USAGE
@@ -84,10 +85,10 @@ when importing the module.  The value must be non-zero.
 =head2 use Test::Number::Delta relative => 1e-3;
 
 As an alternative to using a fixed value for epsilon, provide a C<relative>
-parameter when importing the module.  This signals that C<delta_ok> should 
-test equality with an epsilon that is scaled to the size of the arguments.  
+parameter when importing the module.  This signals that C<delta_ok> should
+test equality with an epsilon that is scaled to the size of the arguments.
 Epsilon is calculated as the relative value times the absolute value
-of the argument with the greatest magnitude.  Mathematically, for arguments 
+of the argument with the greatest magnitude.  Mathematically, for arguments
 'x' and 'y':
 
  epsilon = relative * max( abs(x), abs(y) )
@@ -100,45 +101,45 @@ of the larger value.  The relative value must be non-zero.
 =head2 Combining with a test plan
 
  use Test::Number::Delta 'no_plan';
- 
+
  # or
- 
+
  use Test::Number::Delta within => 1e-9, tests => 1;
- 
-If a test plan has not already been specified, the optional 
-parameter for Test::Number::Delta may be followed with a test plan (see 
+
+If a test plan has not already been specified, the optional
+parameter for Test::Number::Delta may be followed with a test plan (see
 L<Test::More> for details).  If a parameter for Test::Number::Delta is
 given, it must come first.
 
-=cut 
+=cut
 
-my $Test = Test::Builder->new;
-my $Epsilon = 1e-6;
+my $Test     = Test::Builder->new;
+my $Epsilon  = 1e-6;
 my $Relative = undef;
 
 sub import {
-    my $self = shift;
-    my $pack = caller;
+    my $self  = shift;
+    my $pack  = caller;
     my $found = grep /within|relative/, @_;
     croak "Can't specify more than one of 'within' or 'relative'"
-        if $found > 1;
+      if $found > 1;
     if ($found) {
-        my ($param,$value) = splice @_, 0, 2;
+        my ( $param, $value ) = splice @_, 0, 2;
         croak "'$param' parameter must be non-zero"
-            if $value == 0;
-        if ($param eq 'within') {
+          if $value == 0;
+        if ( $param eq 'within' ) {
             $Epsilon = abs($value);
         }
-        elsif ($param eq 'relative') {
+        elsif ( $param eq 'relative' ) {
             $Relative = abs($value);
         }
         else {
             croak "Test::Number::Delta parameters must come first";
         }
-    } 
+    }
     $Test->exported_to($pack);
     $Test->plan(@_);
-    $self->export_to_level(1, $self, $_) for @EXPORT;
+    $self->export_to_level( 1, $self, $_ ) for @EXPORT;
 }
 
 #--------------------------------------------------------------------------#
@@ -146,20 +147,14 @@ sub import {
 #--------------------------------------------------------------------------#
 
 sub _check {
-    my ($p, $q, $epsilon, $name, @indices) = @_;
-    my ($ok, $diag) = ( 1, q{} ); # assume true
+    my ( $p, $q, $epsilon, $name, @indices ) = @_;
+    my ( $ok, $diag ) = ( 1, q{} ); # assume true
     if ( ref $p eq 'ARRAY' || ref $q eq 'ARRAY' ) {
         if ( @$p == @$q ) {
             for my $i ( 0 .. $#{$p} ) {
                 my @new_indices;
-                ($ok, $diag, @new_indices) = _check( 
-                    $p->[$i], 
-                    $q->[$i], 
-                    $epsilon, 
-                    $name,
-                    scalar @indices ? @indices : (),
-                    $i,
-                );
+                ( $ok, $diag, @new_indices ) = _check( $p->[$i], $q->[$i], $epsilon, $name,
+                    scalar @indices ? @indices : (), $i, );
                 if ( not $ok ) {
                     @indices = @new_indices;
                     last;
@@ -168,17 +163,19 @@ sub _check {
         }
         else {
             $ok = 0;
-            $diag = "Got an array of length " . scalar(@$p) .
-                    ", but expected an array of length " . scalar(@$q);
+            $diag =
+                "Got an array of length "
+              . scalar(@$p)
+              . ", but expected an array of length "
+              . scalar(@$q);
         }
     }
     else {
-        $ok = abs($p - $q) < $epsilon;
-        if ( ! $ok ) {
-            my ($ep, $dp) = _ep_dp( $epsilon );
-            $diag = sprintf("%.${dp}f and %.${dp}f are not equal" . 
-                " to within %.${ep}f", $p, $q, $epsilon
-            );
+        $ok = abs( $p - $q ) < $epsilon;
+        if ( !$ok ) {
+            my ( $ep, $dp ) = _ep_dp($epsilon);
+            $diag = sprintf( "%.${dp}f and %.${dp}f are not equal" . " to within %.${ep}f",
+                $p, $q, $epsilon );
         }
     }
     return ( $ok, $diag, scalar(@indices) ? @indices : () );
@@ -186,22 +183,22 @@ sub _check {
 
 sub _ep_dp {
     my $epsilon = shift;
-    my ($exp) = sprintf("%e",$epsilon) =~ m/e(.+)/;
+    my ($exp) = sprintf( "%e", $epsilon ) =~ m/e(.+)/;
     my $ep = $exp < 0 ? -$exp : 1;
     my $dp = $ep + 1;
-    return ($ep, $dp);
+    return ( $ep, $dp );
 }
 
 =head1 FUNCTIONS
 
-=cut 
+=cut
 
 #--------------------------------------------------------------------------#
 # delta_within()
 #--------------------------------------------------------------------------#
 
 =head2 delta_within
- 
+
  delta_within(  $p,  $q, $epsilon, '$p and $q are equal within $epsilon' );
  delta_within( \@p, \@q, $epsilon, '@p and @q are equal within $epsilon' );
 
@@ -234,15 +231,15 @@ The sample prints the following:
 =cut
 
 sub delta_within($$$;$) { ## no critic
-	my ($p, $q, $epsilon, $name) = @_;
+    my ( $p, $q, $epsilon, $name ) = @_;
     croak "Value of epsilon to delta_within must be non-zero"
-        if $epsilon == 0;
+      if $epsilon == 0;
     $epsilon = abs($epsilon);
-    my ($ok, $diag, @indices) = _check( $p, $q, $epsilon, $name );
-    if ( @indices ) {
+    my ( $ok, $diag, @indices ) = _check( $p, $q, $epsilon, $name );
+    if (@indices) {
         $diag = "At [" . join( "][", @indices ) . "]: $diag";
     }
-    return $Test->ok($ok,$name) || $Test->diag( $diag );
+    return $Test->ok( $ok, $name ) || $Test->diag($diag);
 }
 
 #--------------------------------------------------------------------------#
@@ -250,7 +247,7 @@ sub delta_within($$$;$) { ## no critic
 #--------------------------------------------------------------------------#
 
 =head2 delta_ok
- 
+
  delta_ok(  $p,  $q, '$p and $q are close enough to equal' );
  delta_ok( \@p, \@q, '@p and @q are close enough to equal' );
 
@@ -261,12 +258,13 @@ as C<delta_within>.
 =cut
 
 sub delta_ok($$;$) { ## no critic
-	my ($p, $q, $name) = @_;
+    my ( $p, $q, $name ) = @_;
     {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
-        my $e = $Relative 
-            ? $Relative * (abs($p) > abs($q) ? abs($p) : abs($q))
-            : $Epsilon;
+        my $e =
+            $Relative
+          ? $Relative * ( abs($p) > abs($q) ? abs($p) : abs($q) )
+          : $Epsilon;
         delta_within( $p, $q, $e, $name );
     }
 }
@@ -276,7 +274,7 @@ sub delta_ok($$;$) { ## no critic
 #--------------------------------------------------------------------------#
 
 =head2 delta_not_within
- 
+
  delta_not_within(  $p,  $q, '$p and $q are different' );
  delta_not_within( \@p, \@q, $epsilon, '@p and @q are different' );
 
@@ -289,19 +287,19 @@ the same as C<delta_within>.
 =cut
 
 sub delta_not_within($$$;$) { ## no critic
-	my ($p, $q, $epsilon, $name) = @_;
+    my ( $p, $q, $epsilon, $name ) = @_;
     croak "Value of epsilon to delta_not_within must be non-zero"
-        if $epsilon == 0;
+      if $epsilon == 0;
     $epsilon = abs($epsilon);
-    my ($ok, undef, @indices) = _check( $p, $q, $epsilon, $name );
+    my ( $ok, undef, @indices ) = _check( $p, $q, $epsilon, $name );
     $ok = !$ok;
-    my ($ep, $dp) = _ep_dp( $epsilon );
-    my $diag = sprintf("Arguments are equal to within %.${ep}f", $epsilon);
-    return $Test->ok($ok,$name) || $Test->diag( $diag );
+    my ( $ep, $dp ) = _ep_dp($epsilon);
+    my $diag = sprintf( "Arguments are equal to within %.${ep}f", $epsilon );
+    return $Test->ok( $ok, $name ) || $Test->diag($diag);
 }
 
 =head2 delta_not_ok
- 
+
  delta_not_ok(  $p,  $q, '$p and $q are different' );
  delta_not_ok( \@p, \@q, '@p and @q are different' );
 
@@ -312,15 +310,15 @@ the same as C<delta_not_within>.
 =cut
 
 sub delta_not_ok($$;$) { ## no critic
-	my ($p, $q, $name) = @_;
+    my ( $p, $q, $name ) = @_;
     {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
-        my $e = $Relative 
-            ? $Relative * (abs($p) > abs($q) ? abs($p) : abs($q))
-            : $Epsilon;
+        my $e =
+            $Relative
+          ? $Relative * ( abs($p) > abs($q) ? abs($p) : abs($q) )
+          : $Epsilon;
         delta_not_within( $p, $q, $e, $name );
     }
 }
-
 
 1;
