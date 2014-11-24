@@ -148,14 +148,26 @@ sub import {
 #--------------------------------------------------------------------------#
 
 sub _check {
-    my ( $p, $q, $epsilon, $name, @indices ) = @_;
+    my ( $p, $q, $e, $name, @indices ) = @_;
+    my $epsilon;
+
+    if ( !defined $e ) {
+        $epsilon =
+            $Relative
+          ? $Relative * ( abs($p) > abs($q) ? abs($p) : abs($q) )
+          : $Epsilon;
+    }
+    else {
+        $epsilon = abs($e);
+    }
+
     my ( $ok, $diag ) = ( 1, q{} ); # assume true
     if ( ref $p eq 'ARRAY' || ref $q eq 'ARRAY' ) {
         if ( @$p == @$q ) {
             for my $i ( 0 .. $#{$p} ) {
                 my @new_indices;
-                ( $ok, $diag, @new_indices ) = _check( $p->[$i], $q->[$i], $epsilon, $name,
-                    scalar @indices ? @indices : (), $i, );
+                ( $ok, $diag, @new_indices ) =
+                  _check( $p->[$i], $q->[$i], $e, $name, scalar @indices ? @indices : (), $i, );
                 if ( not $ok ) {
                     @indices = @new_indices;
                     last;
@@ -183,11 +195,23 @@ sub _check {
 }
 
 sub _ep_dp {
-    my $epsilon = shift;
+    my $epsilon = shift
+      or return;
+    $epsilon = abs($epsilon);
     my ($exp) = sprintf( "%e", $epsilon ) =~ m/e(.+)/;
     my $ep = $exp < 0 ? -$exp : 1;
     my $dp = $ep + 1;
     return ( $ep, $dp );
+}
+
+sub _diag_default {
+    my ($ep) = _ep_dp( abs( $Relative || $Epsilon ) );
+    my $diag = "Arguments are equal to within ";
+    $diag .=
+      $Relative
+      ? sprintf( "relative tolerance %.${ep}f", abs($Relative) )
+      : sprintf( "%.${ep}f",                    abs($Epsilon) );
+    return $diag;
 }
 
 =head1 FUNCTIONS
@@ -234,8 +258,15 @@ The sample prints the following:
 sub delta_within($$$;$) { ## no critic
     my ( $p, $q, $epsilon, $name ) = @_;
     croak "Value of epsilon to delta_within must be non-zero"
-      if $epsilon == 0;
-    $epsilon = abs($epsilon);
+      if !defined($epsilon) || $epsilon == 0;
+    {
+        local $Test::Builder::Level = $Test::Builder::Level + 1;
+        _delta_within( $p, $q, $epsilon, $name );
+    }
+}
+
+sub _delta_within {
+    my ( $p, $q, $epsilon, $name ) = @_;
     my ( $ok, $diag, @indices ) = _check( $p, $q, $epsilon, $name );
     if (@indices) {
         $diag = "At [" . join( "][", @indices ) . "]: $diag";
@@ -262,11 +293,7 @@ sub delta_ok($$;$) { ## no critic
     my ( $p, $q, $name ) = @_;
     {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
-        my $e =
-            $Relative
-          ? $Relative * ( abs($p) > abs($q) ? abs($p) : abs($q) )
-          : $Epsilon;
-        delta_within( $p, $q, $e, $name );
+        _delta_within( $p, $q, undef, $name );
     }
 }
 
@@ -290,12 +317,22 @@ the same as C<delta_within>.
 sub delta_not_within($$$;$) { ## no critic
     my ( $p, $q, $epsilon, $name ) = @_;
     croak "Value of epsilon to delta_not_within must be non-zero"
-      if $epsilon == 0;
-    $epsilon = abs($epsilon);
+      if !defined($epsilon) || $epsilon == 0;
+    {
+        local $Test::Builder::Level = $Test::Builder::Level + 1;
+        _delta_not_within( $p, $q, $epsilon, $name );
+    }
+}
+
+sub _delta_not_within($$$;$) { ## no critic
+    my ( $p, $q, $epsilon, $name ) = @_;
     my ( $ok, undef, @indices ) = _check( $p, $q, $epsilon, $name );
     $ok = !$ok;
     my ( $ep, $dp ) = _ep_dp($epsilon);
-    my $diag = sprintf( "Arguments are equal to within %.${ep}f", $epsilon );
+    my $diag =
+      defined($epsilon)
+      ? sprintf( "Arguments are equal to within %.${ep}f", abs($epsilon) )
+      : _diag_default();
     return $Test->ok( $ok, $name ) || $Test->diag($diag);
 }
 
@@ -314,11 +351,7 @@ sub delta_not_ok($$;$) { ## no critic
     my ( $p, $q, $name ) = @_;
     {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
-        my $e =
-            $Relative
-          ? $Relative * ( abs($p) > abs($q) ? abs($p) : abs($q) )
-          : $Epsilon;
-        delta_not_within( $p, $q, $e, $name );
+        _delta_not_within( $p, $q, undef, $name );
     }
 }
 

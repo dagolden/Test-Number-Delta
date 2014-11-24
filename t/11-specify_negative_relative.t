@@ -41,13 +41,13 @@ test_test("delta_ok works");
 
 test_out("not ok 1 - foo");
 test_fail(+2);
-test_diag("Arguments are equal to within 0.00001");
+test_diag("Arguments are equal to within relative tolerance 0.01");
 delta_not_ok( 1e-3, 9.91e-4, "foo" );
 test_test("delta_not_ok fail works");
 
 test_out("not ok 1 - foo");
 test_fail(+2);
-test_diag("Arguments are equal to within 0.5");
+test_diag("Arguments are equal to within relative tolerance 0.01");
 delta_not_ok( -50, -49.6, "foo" );
 test_test("delta_no_ok fail works");
 
