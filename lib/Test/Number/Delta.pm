@@ -3,7 +3,8 @@ use warnings;
 
 package Test::Number::Delta;
 # ABSTRACT: Compare the difference between numbers against a given tolerance
-# VERSION
+
+our $VERSION = '1.05';
 
 use vars qw (@EXPORT @ISA);
 
