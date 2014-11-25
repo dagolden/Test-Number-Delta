@@ -4,7 +4,7 @@ use warnings;
 package Test::Number::Delta;
 # ABSTRACT: Compare the difference between numbers against a given tolerance
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use vars qw (@EXPORT @ISA);
 
