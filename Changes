@@ -4,7 +4,11 @@ Revision history for Perl module Test::Number::Delta
 
     [Fixed]
 
-    - make 0 and 0 compare equal with a relative epsilon
+    - Make 0 and 0 compare equal with a relative epsilon
+
+    [Documented]
+
+    - Added SEE ALSO with Number::Tolerant and Test::Deep::NumberTolerant
 
 1.05      2014-11-24 11:08:11-05:00 America/New_York
 

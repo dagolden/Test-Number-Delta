@@ -355,4 +355,12 @@ sub delta_not_ok($$;$) { ## no critic
     }
 }
 
+=head1 SEE ALSO
+
+=for :list
+* L<Number::Tolerant>
+* L<Test::Deep::NumberTolerant>
+
+=cut
+
 1;
