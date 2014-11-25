@@ -184,7 +184,7 @@ sub _check {
         }
     }
     else {
-        $ok = abs( $p - $q ) < $epsilon;
+        $ok = $p == $q || abs( $p - $q ) < $epsilon;
         if ( !$ok ) {
             my ( $ep, $dp ) = _ep_dp($epsilon);
             $diag = sprintf( "%.${dp}f and %.${dp}f are not equal" . " to within %.${ep}f",
@@ -195,8 +195,8 @@ sub _check {
 }
 
 sub _ep_dp {
-    my $epsilon = shift
-      or return;
+    my $epsilon = shift;
+    return ( 0, 0 ) unless $epsilon;
     $epsilon = abs($epsilon);
     my ($exp) = sprintf( "%e", $epsilon ) =~ m/e(.+)/;
     my $ep = $exp < 0 ? -$exp : 1;

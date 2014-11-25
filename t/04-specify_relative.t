@@ -1,6 +1,6 @@
 use strict;
 
-use Test::Builder::Tester tests  => 14;
+use Test::Builder::Tester tests  => 16;
 use Test::Number::Delta relative => 1e-2;
 
 #--------------------------------------------------------------------------#
@@ -39,6 +39,14 @@ test_test("delta_ok works");
 
 test_out("ok 1 - foo");
 delta_ok( -100, -99.1, "foo" );
+test_test("delta_ok works");
+
+test_out("ok 1 - foo");
+delta_ok( 0, 0, "foo" );
+test_test("delta_ok works");
+
+test_out("ok 1 - foo");
+delta_ok( [0], [0], "foo" );
 test_test("delta_ok works");
 
 #--------------------------------------------------------------------------#

@@ -2,6 +2,10 @@ Revision history for Perl module Test::Number::Delta
 
 {{$NEXT}}
 
+    [Fixed]
+
+    - make 0 and 0 compare equal with a relative epsilon
+
 1.05      2014-11-24 11:08:11-05:00 America/New_York
 
     [Fixed]
